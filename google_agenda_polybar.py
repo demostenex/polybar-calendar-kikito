@@ -174,19 +174,31 @@ def fetch_events(
     service = build_service(credentials_file, token_file, open_browser=open_browser)
     time_min = now_utc_iso()
     time_max = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=days)).isoformat()
-    result = (
-        service.events()
-        .list(
-            calendarId=calendar_id,
-            timeMin=time_min,
-            timeMax=time_max,
-            maxResults=limit,
-            singleEvents=True,
-            orderBy="startTime",
+    collected: list[dict[str, Any]] = []
+    next_page_token: str | None = None
+    page_size = 2500
+
+    while True:
+        max_results = page_size if limit <= 0 else min(page_size, max(1, limit - len(collected)))
+        result = (
+            service.events()
+            .list(
+                calendarId=calendar_id,
+                timeMin=time_min,
+                timeMax=time_max,
+                maxResults=max_results,
+                singleEvents=True,
+                orderBy="startTime",
+                pageToken=next_page_token,
+            )
+            .execute()
         )
-        .execute()
-    )
-    return result.get("items", [])
+        collected.extend(result.get("items", []))
+        if limit > 0 and len(collected) >= limit:
+            return collected[:limit]
+        next_page_token = result.get("nextPageToken")
+        if not next_page_token:
+            return collected
 
 
 def get_events(
@@ -276,7 +288,7 @@ def main() -> int:
     parser.add_argument("--notify-state-file", default=str(DEFAULT_NOTIFY_STATE))
     parser.add_argument("--cache-ttl", type=int, default=300)
     parser.add_argument("--days", type=int, default=7)
-    parser.add_argument("--limit", type=int, default=8)
+    parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--alert-minutes", type=int, default=10)
     parser.add_argument("--details-date-format", default="%x")
     parser.add_argument("--list-max-len", type=int, default=30)

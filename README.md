@@ -44,6 +44,7 @@ Use o bloco de `polybar-module.ini` no seu `~/.config/polybar/config.ini` e adic
 
 - consulta ao Google: a cada 30 min (`--cache-ttl 1800`)
 - atualização no Polybar: a cada 60s
+- janela de busca: 7 dias (`--days 7`) com eventos ilimitados (`--limit 0`)
 - alerta: quando faltar até 10 min para o próximo evento com horário
 
 ## Segurança

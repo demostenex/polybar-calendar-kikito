@@ -11,3 +11,7 @@ token.json
 # Runtime/cache local files
 *.pid
 *.log
+
+# Local docs (do not commit)
+diario-de-bordo.md
+artigo-seguranca-credenciais.md
