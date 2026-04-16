@@ -26,6 +26,13 @@ def now_utc_iso() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
+def end_of_local_day_iso(days_ahead: int) -> str:
+    now_local = dt.datetime.now().astimezone()
+    target_date = now_local.date() + dt.timedelta(days=days_ahead)
+    target = dt.datetime.combine(target_date, dt.time(23, 59, 59), tzinfo=now_local.tzinfo)
+    return target.isoformat()
+
+
 def parse_date(date_text: str) -> dt.datetime:
     if "T" not in date_text:
         parsed = dt.datetime.strptime(date_text, "%Y-%m-%d")
@@ -173,7 +180,7 @@ def fetch_events(
 ) -> list[dict[str, Any]]:
     service = build_service(credentials_file, token_file, open_browser=open_browser)
     time_min = now_utc_iso()
-    time_max = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=days)).isoformat()
+    time_max = end_of_local_day_iso(days)
     collected: list[dict[str, Any]] = []
     next_page_token: str | None = None
     page_size = 2500
