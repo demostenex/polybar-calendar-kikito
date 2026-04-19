@@ -6,7 +6,7 @@ import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from google_agenda_polybar import (
+from eventos import (
     details_lines,
     find_alert_event,
     list_rows,

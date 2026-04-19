@@ -4,7 +4,7 @@ import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from google_agenda_polybar import (
+from formatadores import (
     end_of_local_day_iso,
     format_event,
     parse_date,

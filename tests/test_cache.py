@@ -7,7 +7,7 @@ import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from google_agenda_polybar import load_cache, save_cache
+from cache import load_cache, save_cache
 
 
 class TestLoadCache:

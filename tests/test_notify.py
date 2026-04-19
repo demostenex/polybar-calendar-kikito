@@ -1,16 +1,16 @@
 import sys
 import pathlib
-from unittest.mock import patch, call
+from unittest.mock import patch
 
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from google_agenda_polybar import (
-    load_notify_state,
-    save_notify_state,
-    notify_event_if_needed,
+from notificador import (
     event_key,
+    load_notify_state,
+    notify_event_if_needed,
+    save_notify_state,
 )
 
 EVENTO_BASE = {
@@ -60,7 +60,7 @@ class TestEventKey:
 class TestNotifyEventIfNeeded:
     def test_envia_notificacao_na_primeira_vez(self, tmp_path):
         f = tmp_path / "state.json"
-        with patch("google_agenda_polybar.subprocess.run") as mock_run:
+        with patch("notificador.subprocess.run") as mock_run:
             notify_event_if_needed(EVENTO_BASE, f)
             assert mock_run.called
             args = mock_run.call_args[0][0]
@@ -70,20 +70,20 @@ class TestNotifyEventIfNeeded:
         f = tmp_path / "state.json"
         key = event_key(EVENTO_BASE)
         save_notify_state(f, {"last_key": key})
-        with patch("google_agenda_polybar.subprocess.run") as mock_run:
+        with patch("notificador.subprocess.run") as mock_run:
             notify_event_if_needed(EVENTO_BASE, f)
             assert not mock_run.called
 
     def test_reenvia_quando_chave_muda(self, tmp_path):
         f = tmp_path / "state.json"
         save_notify_state(f, {"last_key": "outro:evento"})
-        with patch("google_agenda_polybar.subprocess.run") as mock_run:
+        with patch("notificador.subprocess.run") as mock_run:
             notify_event_if_needed(EVENTO_BASE, f)
             assert mock_run.called
 
     def test_persiste_chave_apos_notificar(self, tmp_path):
         f = tmp_path / "state.json"
-        with patch("google_agenda_polybar.subprocess.run"):
+        with patch("notificador.subprocess.run"):
             notify_event_if_needed(EVENTO_BASE, f)
         state = load_notify_state(f)
         assert state["last_key"] == event_key(EVENTO_BASE)

@@ -118,10 +118,10 @@ if [[ "$SHOW_LIST" == "1" ]]; then
     --fixed \
     --title="Calendario + Agenda" \
     --mouse \
-    --close-on-unfocus \
     --skip-taskbar \
     --on-top \
     --sticky \
+    --button="Fechar:8" \
     --print-xid="$XID_FILE" >/dev/null 2>&1 &
   PANED_PID="$!"
   sleep 0.12
@@ -138,10 +138,10 @@ else
     --fixed \
     --title="Calendario" \
     --mouse \
-    --close-on-unfocus \
     --skip-taskbar \
     --on-top \
     --sticky \
+    --button="Fechar:8" \
     --print-xid="$XID_FILE" >/dev/null 2>&1 &
   CAL_ONLY_PID="$!"
   sleep 0.12
