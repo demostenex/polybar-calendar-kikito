@@ -17,7 +17,6 @@ BASE_DIR = pathlib.Path(__file__).resolve().parent
 DEFAULT_CREDENTIALS = BASE_DIR / "credentials.json"
 DEFAULT_TOKEN = BASE_DIR / "token.json"
 DEFAULT_CACHE = BASE_DIR / ".events_cache.json"
-DEFAULT_CACHE = BASE_DIR / ".events_cache.json"
 DEFAULT_NOTIFY_STATE = BASE_DIR / ".notify_state.json"
 
 
@@ -108,7 +107,7 @@ def main() -> int:
 
     alert_event = find_alert_event(events, args.alert_minutes)
     if not alert_event:
-        print("")
+        print(" ")
         return 0
 
     notify_event_if_needed(alert_event, notify_state_file)
