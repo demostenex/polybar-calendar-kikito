@@ -5,8 +5,29 @@ PID_FILE="${XDG_RUNTIME_DIR:-/tmp}/polybar-yad-calendar.pid"
 DETAILS_FILE="${XDG_RUNTIME_DIR:-/tmp}/polybar-yad-calendar-details.txt"
 LIST_FILE="${XDG_RUNTIME_DIR:-/tmp}/polybar-yad-calendar-list.txt"
 STATE_FILE="${XDG_RUNTIME_DIR:-/tmp}/polybar-yad-calendar-state"
+XID_FILE="${XDG_RUNTIME_DIR:-/tmp}/polybar-yad-calendar.xid"
 PYTHON_BIN="$HOME/.config/polybar/scripts/.venv/bin/python"
 AGENDA_SCRIPT="$HOME/.config/polybar/scripts/google_agenda_polybar.py"
+CAL_OPACITY="${CAL_OPACITY:-0.92}"
+
+apply_opacity() {
+  local xid="${1:-}"
+  if [[ -z "$xid" ]] || ! command -v xprop >/dev/null 2>&1; then
+    return
+  fi
+  local opacity_hex
+  opacity_hex="$(python3 - <<'PY' "$CAL_OPACITY"
+import sys
+try:
+    v=float(sys.argv[1])
+except Exception:
+    v=0.92
+v=max(0.05, min(1.0, v))
+print(hex(int(v * 0xFFFFFFFF)))
+PY
+)"
+  xprop -id "$xid" -f _NET_WM_WINDOW_OPACITY 32c -set _NET_WM_WINDOW_OPACITY "$opacity_hex" >/dev/null 2>&1 || true
+}
 
 if [[ "${1:-}" == "--toggle-list" ]]; then
   current="1"
@@ -100,8 +121,11 @@ if [[ "$SHOW_LIST" == "1" ]]; then
     --close-on-unfocus \
     --skip-taskbar \
     --on-top \
-    --sticky >/dev/null 2>&1 &
+    --sticky \
+    --print-xid="$XID_FILE" >/dev/null 2>&1 &
   PANED_PID="$!"
+  sleep 0.12
+  apply_opacity "$(cat "$XID_FILE" 2>/dev/null || true)"
   printf "%s\n%s\n%s\n" "$PANED_PID" "$CAL_PID" "$LIST_PID" >"$PID_FILE"
 else
   yad \
@@ -117,7 +141,10 @@ else
     --close-on-unfocus \
     --skip-taskbar \
     --on-top \
-    --sticky >/dev/null 2>&1 &
+    --sticky \
+    --print-xid="$XID_FILE" >/dev/null 2>&1 &
   CAL_ONLY_PID="$!"
+  sleep 0.12
+  apply_opacity "$(cat "$XID_FILE" 2>/dev/null || true)"
   printf "%s\n" "$CAL_ONLY_PID" >"$PID_FILE"
 fi
