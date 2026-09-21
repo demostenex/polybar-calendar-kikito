@@ -7,6 +7,8 @@ credentials.json
 token.json
 .events_cache.json
 .notify_state.json
+.xbar_calendar_today_cache.json
+.xbar_calendar_window_cache.json
 
 # Runtime/cache local files
 *.pid

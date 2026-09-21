@@ -39,10 +39,12 @@ def fetch_events(
     days: int,
     limit: int,
     open_browser: bool,
+    time_min: str | None = None,
+    time_max: str | None = None,
 ) -> list[dict[str, Any]]:
     service = build_service(credentials_file, token_file, open_browser=open_browser)
-    time_min = now_utc_iso()
-    time_max = end_of_local_day_iso(days)
+    time_min = time_min or now_utc_iso()
+    time_max = time_max or end_of_local_day_iso(days)
     collected: list[dict[str, Any]] = []
     next_page_token: str | None = None
     page_size = 2500
@@ -79,12 +81,21 @@ def get_events(
     limit: int,
     ttl: int,
     open_browser: bool,
+    time_min: str | None = None,
+    time_max: str | None = None,
 ) -> list[dict[str, Any]]:
     cached = load_cache(cache_file, ttl)
     if cached is not None:
         return cached
     events = fetch_events(
-        credentials_file, token_file, calendar_id, days, limit, open_browser=open_browser
+        credentials_file,
+        token_file,
+        calendar_id,
+        days,
+        limit,
+        open_browser=open_browser,
+        time_min=time_min,
+        time_max=time_max,
     )
     save_cache(cache_file, events)
     return events
